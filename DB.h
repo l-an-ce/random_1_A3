@@ -25,36 +25,44 @@
  */
 #define INIT_SIZE 5  
 typedef struct {
-    int code;
-    char *value;
-  } Pair;
-  
-  typedef struct{
-  
-     Pair arr[INIT_SIZE]; 
-  
-  } Table;
-  
-  typedef struct{
-    Pair *arr;
-  
-  } NeighborhoodTable;
-  
-  typedef struct{
-     //int tableID;? gotta create one but idk for what purpose 
-     // will need to create a function to allocate memory?
-     int siteId;
-     int tableTypeId;
-     int surfaceMaterialId;
-     int structuralMaterialId;
-     char* streetAvenue;
-     int neughbhdId;
-     int neigbourhoodName; // new
-     int ward;
-     char* latitude;
-     char*longtitude;
-  
-  } PicnicTable;
+  int code;
+  char *type;
+} Pair;
+
+typedef struct{
+  /*
+    turn this into an array of characters so that its "code" can just be the index
+    that way its easier to find the specific thing
+ */ 
+    char *arr[INIT_SIZE]; 
+
+} Table;
+
+typedef struct{ 
+  /*
+    make it an array that points to a pointer that points to an array
+    so we dont have to worry about the size since pointer to pointer bs
+ */
+  Pair *arr;
+
+} NeighbourhoodTable;
+
+typedef struct{
+   int tableID; // make the tableID be the index the first time it gets added to datbase? 
+   // will need to create a function to allocate memory?
+   int siteId;
+   int tableTypeId;
+   int surfaceMaterialId;
+   int structuralMaterialId;
+   char *streetAvenue;
+   int neighbourhoodId;
+   char *neighbourhoodName; // new
+   int ward;
+   char *latitude;
+   char *longtitude;
+
+} PicnicTable;
+
 
 /*
  * You may change the internal details of the struct below,
