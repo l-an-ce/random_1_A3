@@ -34,7 +34,7 @@ typedef struct{
     turn this into an array of characters so that its "code" can just be the index
     that way its easier to find the specific thing
  */ 
-    char *arr[INIT_SIZE]; 
+    char *arr[INIT_SIZE];
 
 } Table;
 
@@ -59,7 +59,7 @@ typedef struct{
    char *neighbourhoodName; // new
    int ward;
    char *latitude;
-   char *longtitude;
+   char *longitude;
 
 } PicnicTable;
 
@@ -75,6 +75,11 @@ typedef struct {
     Table *structuralMaterialTable;
     NeighbourhoodTable *neighborhoodTable;
     PicnicTable *picnicTableTable;
+    int size_of_PtableTable; // keep track of the size of picnicTableTable array
+    int size_tableTypeTable;
+    int size_surfaceMaterialTable;
+    int size_structuralMaterialTable;
+    int size_neighTable;
 } DataBase;
 
 /* Declare a global DataBase variable*/
