@@ -14,6 +14,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+DataBase *Db;
+
 /*
  * Take the name of a member of the picnicTable entry and a value for that member 
  * as parameters and return the number of entries in the picnicTable which have 

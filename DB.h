@@ -34,7 +34,7 @@ typedef struct{
     turn this into an array of characters so that its "code" can just be the index
     that way its easier to find the specific thing
  */ 
-    char *arr[INIT_SIZE];
+    char **arr;
 
 } Table;
 
