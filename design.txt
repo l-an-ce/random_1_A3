@@ -1,0 +1,23 @@
+Marek Design Document
+
+sortByMember Function:
+The approach to this function was a simplistic if/else structure in which the memberName
+was checked with all possible members from the PicnicTable data struct. If the memberName
+matched any of possible options, qsort would be ran with an accompanying compare function. 
+One of the possible downsides to this is long code with many compare function being needed,
+an alternate solution could have been a specific compare functions for string/alphabetical sorting 
+and another for int/numerical sorting. However this code would be much more difficult to read by 
+other group members and much harder to pinpoint where and possibly which members we're causing issues
+in troubleshooting if necessary.
+
+reportByNeighbourhood and reportByWard Functions:
+Both the report functions were written with the same approach. First the functions would use 
+the sortByMember function to get the data in the correct ascending order, then the functions would 
+loop through the PicnicTable database and print each table under the appropriate header. A problem 
+that did arise was visually pleasing spacing within the reportByNeighbourhood function. Having the first 
+item be printed outside of the if statement that prints the header like in reportByWard, caused there to 
+be incosistent spacing between header and items due to longer neighbourhood names needing to be displayed 
+for each neighbourhood. The first attempted solution was adding more \t spaces but this caused much too large 
+of a gap between headers and items. So a middleground was found where the first item could be printed at 
+the same time as the header with different spacing to the other subsequent items within that specific 
+neighbourhood section.  
