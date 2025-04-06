@@ -58,134 +58,135 @@ DataBase *Db;
  }
  
  void importDB(char *filename) {
-     FILE *fp = fopen(filename, "r");
-     if (!fp) {
-         printf("Could not open file %s\n", filename);
-         return;
-     }
- 
-     Db = malloc(sizeof(DataBase));
- 
-     // allocate tables
-     Db->tableTypeTable = malloc(sizeof(Table));
-     Db->surfaceMaterialTable = malloc(sizeof(Table));
-     Db->structuralMaterialTable = malloc(sizeof(Table));
-     Db->neighborhoodTable = malloc(sizeof(NeighbourhoodTable));
- 
-     Db->tableTypeTable->arr = NULL;
-     Db->surfaceMaterialTable->arr = NULL;
-     Db->structuralMaterialTable->arr = NULL;
-     Db->neighborhoodTable->arr = NULL;
- 
-     Db->size_tableTypeTable = 0;
-     Db->size_surfaceMaterialTable = 0;
-     Db->size_structuralMaterialTable = 0;
-     Db->size_neighTable = 0;
-     Db->size_of_PtableTable = 0;
- 
-     int capacity = INITIAL_TABLE_CAPACITY;
-     Db->picnicTableTable = malloc(capacity * sizeof(PicnicTable));
- 
-     char line[LINE_BUFFER];
-     fgets(line, LINE_BUFFER, fp);  // skip header
- 
-     while (fgets(line, LINE_BUFFER, fp)) {
-         // resize if needed
-         if (Db->size_of_PtableTable >= capacity) {
-             capacity *= 2;
-             Db->picnicTableTable = realloc(Db->picnicTableTable, capacity * sizeof(PicnicTable));
-             if (!Db->picnicTableTable) {
-                 printf("Error reallocating picnicTableTable.\n");
-                 exit(1);
-             }
-         }
- 
-         PicnicTable *pt = &Db->picnicTableTable[Db->size_of_PtableTable];
-         char *token;
- 
-         token = strtok(line, ",");
-         pt->siteId = atoi(token);
- 
-         token = strtok(NULL, ",");
-         pt->tableTypeId = addToTable(Db->tableTypeTable, &Db->size_tableTypeTable, token);
- 
-         token = strtok(NULL, ",");
-         pt->surfaceMaterialId = addToTable(Db->surfaceMaterialTable, &Db->size_surfaceMaterialTable, token);
- 
-         token = strtok(NULL, ",");
-         pt->structuralMaterialId = addToTable(Db->structuralMaterialTable, &Db->size_structuralMaterialTable, token);
- 
-         token = strtok(NULL, ",");
-         pt->streetAvenue = strdup(token);
- 
-         token = strtok(NULL, ",");
-         pt->neighbourhoodId = atoi(token);
- 
-         token = strtok(NULL, ",");
-         pt->neighbourhoodName = strdup(token);
-         addNeighbourhood(&Db->neighborhoodTable->arr, &Db->size_neighTable, pt->neighbourhoodId, pt->neighbourhoodName);
- 
-         token = strtok(NULL, ",");
-         if (strncmp(token, "WARD ", 5) == 0)
-             pt->ward = atoi(token + 5);  // handle "WARD xx"
-         else
-             pt->ward = atoi(token);
- 
-         token = strtok(NULL, ",");
-         pt->latitude = strdup(token);
- 
-         token = strtok(NULL, ",\n");
-         pt->longitude = strdup(token);
- 
-         pt->tableID = Db->size_of_PtableTable;
-         Db->size_of_PtableTable++;
-     }
- 
-     fclose(fp);
-     printf("Database imported successfully from %s\n", filename);
-     printf("Imported %d picnic tables.\n", Db->size_of_PtableTable);
+    FILE *fp = fopen(filename, "r");  // open the csv file to read
+    if (!fp) {
+        printf("Could not open file %s\n", filename);
+        return;
+    }
 
- }
- 
- void exportDB(char *filename) {
-     if (!Db) {
-         printf("No database to export.\n");
-         return;
-     }
- 
-     FILE *fp = fopen(filename, "w");
-     if (!fp) {
-         printf("Could not open file %s for writing.\n", filename);
-         return;
-     }
- 
-     // write csv header
-     fprintf(fp, "Id,Table Type,Surface Material,Structural Material,Street / Avenue,Neighbourhood Id,Neighbourhood Name,Ward,Latitude,Longitude,Location\n");
- 
-     for (int i = 0; i < Db->size_of_PtableTable; i++) {
-         PicnicTable pt = Db->picnicTableTable[i];
+    Db = malloc(sizeof(DataBase));  // make space for the whole database
 
-     
-         // write one row
-         fprintf(fp, "%d,%s,%s,%s,%s,%d,%s,WARD %02d,%s,%s,\"(%s,%s)\"\n",
-             pt.siteId,
-             Db->tableTypeTable->arr[pt.tableTypeId],
-             Db->surfaceMaterialTable->arr[pt.surfaceMaterialId],
-             Db->structuralMaterialTable->arr[pt.structuralMaterialId],
-             pt.streetAvenue,
-             pt.neighbourhoodId,
-             pt.neighbourhoodName,
-             pt.ward,
-             pt.latitude,
-             pt.longitude,
-             pt.latitude,
-             pt.longitude
-         );
-     }
- 
-     fclose(fp);
-     printf("Database exported successfully to %s\n", filename);
- }
+    // set up memory for all the different tables
+    Db->tableTypeTable = malloc(sizeof(Table));
+    Db->surfaceMaterialTable = malloc(sizeof(Table));
+    Db->structuralMaterialTable = malloc(sizeof(Table));
+    Db->neighborhoodTable = malloc(sizeof(NeighbourhoodTable));
+
+    // initialize them to empty/null
+    Db->tableTypeTable->arr = NULL;
+    Db->surfaceMaterialTable->arr = NULL;
+    Db->structuralMaterialTable->arr = NULL;
+    Db->neighborhoodTable->arr = NULL;
+
+    // start sizes at zero
+    Db->size_tableTypeTable = 0;
+    Db->size_surfaceMaterialTable = 0;
+    Db->size_structuralMaterialTable = 0;
+    Db->size_neighTable = 0;
+    Db->size_of_PtableTable = 0;
+
+    int capacity = INITIAL_TABLE_CAPACITY;  // how many tables we can hold at first
+    Db->picnicTableTable = malloc(capacity * sizeof(PicnicTable));  // space for picnic table records
+
+    char line[LINE_BUFFER];
+    fgets(line, LINE_BUFFER, fp);  // skip the first line 
+
+    while (fgets(line, LINE_BUFFER, fp)) {
+        // double the space if full
+        if (Db->size_of_PtableTable >= capacity) {
+            capacity *= 2;
+            Db->picnicTableTable = realloc(Db->picnicTableTable, capacity * sizeof(PicnicTable));
+            if (!Db->picnicTableTable) {
+                printf("Error reallocating picnicTableTable.\n");
+                exit(1);
+            }
+        }
+
+        PicnicTable *pt = &Db->picnicTableTable[Db->size_of_PtableTable];
+        char *token;
+
+        // go through each comma separated value in the line
+        token = strtok(line, ",");
+        pt->siteId = atoi(token);  // site id
+
+        token = strtok(NULL, ",");
+        pt->tableTypeId = addToTable(Db->tableTypeTable, &Db->size_tableTypeTable, token);  // table type
+
+        token = strtok(NULL, ",");
+        pt->surfaceMaterialId = addToTable(Db->surfaceMaterialTable, &Db->size_surfaceMaterialTable, token);  // surface material
+
+        token = strtok(NULL, ",");
+        pt->structuralMaterialId = addToTable(Db->structuralMaterialTable, &Db->size_structuralMaterialTable, token);  // structural material
+
+        token = strtok(NULL, ",");
+        pt->streetAvenue = strdup(token);  // copy the string
+
+        token = strtok(NULL, ",");
+        pt->neighbourhoodId = atoi(token);  // neighborhood id
+
+        token = strtok(NULL, ",");
+        pt->neighbourhoodName = strdup(token);  // copy name
+        addNeighbourhood(&Db->neighborhoodTable->arr, &Db->size_neighTable, pt->neighbourhoodId, pt->neighbourhoodName);  // keep track of neighborhoods
+
+        token = strtok(NULL, ",");
+        if (strncmp(token, "WARD ", 5) == 0)
+            pt->ward = atoi(token + 5); 
+        else
+            pt->ward = atoi(token);  
+
+        token = strtok(NULL, ",");
+        pt->latitude = strdup(token);  // copy latitude
+
+        token = strtok(NULL, ",\n");
+        pt->longitude = strdup(token);  // copy longitude
+
+        pt->tableID = Db->size_of_PtableTable;  // assign a table id (just use its index)
+        Db->size_of_PtableTable++;
+    }
+
+    fclose(fp);
+    printf("Database imported successfully from %s\n", filename);
+    printf("Imported %d picnic tables.\n", Db->size_of_PtableTable);
+}
+
+void exportDB(char *filename) {
+    if (!Db) {
+        printf("No database to export.\n");
+        return;
+    }
+
+    FILE *fp = fopen(filename, "w");  // open file to write
+    if (!fp) {
+        printf("Could not open file %s for writing.\n", filename);
+        return;
+    }
+
+    // write the CSV header
+    fprintf(fp, "Id,Table Type,Surface Material,Structural Material,Street / Avenue,Neighbourhood Id,Neighbourhood Name,Ward,Latitude,Longitude,Location\n");
+
+    for (int i = 0; i < Db->size_of_PtableTable; i++) {
+        PicnicTable pt = Db->picnicTableTable[i];
+
+        // write each row with actual values instead of ids
+        fprintf(fp, "%d,%s,%s,%s,%s,%d,%s,WARD %02d,%s,%s,\"(%s, %s)\"\n",
+            pt.siteId,
+            Db->tableTypeTable->arr[pt.tableTypeId],
+            Db->surfaceMaterialTable->arr[pt.surfaceMaterialId],
+            Db->structuralMaterialTable->arr[pt.structuralMaterialId],
+            pt.streetAvenue,
+            pt.neighbourhoodId,
+            pt.neighbourhoodName,
+            pt.ward,
+            pt.latitude,
+            pt.longitude,
+            pt.latitude,
+            pt.longitude
+        );
+    }
+
+    fclose(fp);
+    printf("Database exported successfully to %s\n", filename);
+}
 
 int countEntries(char *memberName, char * value){
     /*
@@ -254,7 +255,6 @@ int countEntries(char *memberName, char * value){
                 }
                 Db->picnicTableTable[i].tableTypeId = T_code;
                 edited = 1;
-                break;
             }
 
             else if (strcmp(constanted, "Surface Material") == 0) {
@@ -265,7 +265,6 @@ int countEntries(char *memberName, char * value){
                 }
                 Db->picnicTableTable[i].surfaceMaterialId = T_code;
                 edited = 1;
-                break;
             }
 
             else if (strcmp(constanted, "Structural Material") == 0) {
@@ -276,7 +275,40 @@ int countEntries(char *memberName, char * value){
                 }
                 Db->picnicTableTable[i].structuralMaterialId = T_code;
                 edited = 1;
-                break;
+            }
+
+            else if (strcmp(constanted, "Street / Avenue") == 0) {
+                strncpy(Db->picnicTableTable[i].streetAvenue, value, sizeof(Db->picnicTableTable[i].streetAvenue) - 1);
+                Db->picnicTableTable[i].streetAvenue[sizeof(Db->picnicTableTable[i].streetAvenue) - 1] = '\0';
+                edited = 1;
+            }
+
+            else if (strcmp(constanted, "Neighbourhood ID") == 0) {
+                Db->picnicTableTable[i].neighbourhoodId = atoi(value);
+                edited = 1;
+            }
+
+            else if (strcmp(constanted, "Neighbourhood Name") == 0) {
+                strncpy(Db->picnicTableTable[i].neighbourhoodName, value, sizeof(Db->picnicTableTable[i].neighbourhoodName) - 1);
+                Db->picnicTableTable[i].neighbourhoodName[sizeof(Db->picnicTableTable[i].neighbourhoodName) - 1] = '\0';
+                edited = 1;
+            }
+
+            else if (strcmp(constanted, "Ward") == 0) {
+                Db->picnicTableTable[i].ward = atoi(value);
+                edited = 1;
+            }
+
+            else if (strcmp(constanted, "Latitude") == 0) {
+                strncpy(Db->picnicTableTable[i].latitude, value, sizeof(Db->picnicTableTable[i].latitude) - 1);
+                Db->picnicTableTable[i].latitude[sizeof(Db->picnicTableTable[i].latitude) - 1] = '\0';
+                edited = 1;
+            }
+
+            else if (strcmp(constanted, "Longitude") == 0) {
+                strncpy(Db->picnicTableTable[i].longitude, value, sizeof(Db->picnicTableTable[i].longitude) - 1);
+                Db->picnicTableTable[i].longitude[sizeof(Db->picnicTableTable[i].longitude) - 1] = '\0';
+                edited = 1;
             }
 
             break;
@@ -286,7 +318,7 @@ int countEntries(char *memberName, char * value){
     if (edited) {
         printf("Edited successfully.\n");
     } else {
-        printf("Error: ID not found.\n");
+        printf("Error: ID not found or invalid member name.\n");
     }
 }
 
@@ -577,6 +609,7 @@ char *tableCodeToString(int givenId, const char *tableName)
     {
         return NULL;
     }
+    return NULL;
 }
 
 void reportByNeighbourhood() 

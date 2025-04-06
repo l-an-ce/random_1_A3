@@ -1,0 +1,33 @@
+Testing Strategy for Database Program
+
+Test Data Files:
+
+1. PicnicTableSmall.csv
+A small dataset applicable for  testing and  result evaluation.
+It assists in testing consistency between record import and export processes with minimal records.
+
+2. PicnicTable.csv
+A comprehensive dataset meant for complete functionality verification testing.
+Ensures that the program sustains expected operations during larger workloads.
+
+Test Input Files:
+1. test_input.txt
+Validated basic import/export processes
+Steps:
+i.Import from Tests/PicnicTableSmall.csv
+ii. Export to Tests/outputPicnicTableSmall.csv
+iii. Validate output against PicnicTableSmall.csv
+
+2. test_input_full.txt
+A comprehensive functional validation test that processes the subsequent tasks:    
+Count Entries
+Sort By
+Edit Entry
+Report by Neighbourhood
+Report by Ward
+
+Used valgrind to identify memory leaks.Checks that all dynamically allocated memory is released at the end of the program.
+
+Our test include both small and large datasetand all features of the application. When combined with memory checks done with Valgrind, these tests provide assurance in the correctness and reliability of the program.
+
+

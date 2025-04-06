@@ -82,17 +82,51 @@ int main(int argc, char *argv[]) {
                     break;
                 }
                 case 5: {
-                    int tableID;
-                    char memberName[50], value[50];
-                    printf("Enter table ID: ");
-                    scanf("%d", &tableID);
-                    getchar();
-                    printf("Enter member name to edit: ");
-                    scanf(" %[^\n]", memberName);
-                    printf("Enter new value: ");
-                    scanf(" %[^\n]", value);
-                    editTableEntry(tableID, memberName, value);
+                    int siteID, editChoice;
+                    char value[128];
+                    char *memberName = NULL;
+                
+                    printf("Enter site ID: ");
+                    scanf("%d", &siteID);
+                    getchar();  // Consume newline
+                
+                    printf("Choose field to edit:\n");
+                    printf("  1. Table Type\n");
+                    printf("  2. Surface Material\n");
+                    printf("  3. Structural Material\n");
+                    printf("  4. Street / Avenue\n");
+                    printf("  5. Neighbourhood ID\n");
+                    printf("  6. Neighbourhood Name\n");
+                    printf("  7. Ward\n");
+                    printf("  8. Latitude\n");
+                    printf("  9. Longitude\n");
+                    printf("Enter your choice: ");
+                    scanf("%d", &editChoice);
+                    getchar();  // Consume newline
+                
+                    switch (editChoice) {
+                        case 1: memberName = "Table Type"; break;
+                        case 2: memberName = "Surface Material"; break;
+                        case 3: memberName = "Structural Material"; break;
+                        case 4: memberName = "Street / Avenue"; break;
+                        case 5: memberName = "Neighbourhood ID"; break;
+                        case 6: memberName = "Neighbourhood Name"; break;
+                        case 7: memberName = "Ward"; break;
+                        case 8: memberName = "Latitude"; break;
+                        case 9: memberName = "Longitude"; break;
+                        default:
+                            printf("Invalid choice.\n");
+                            break;
+                    }
+                
+                    if (memberName != NULL) {
+                        printf("Enter new value: ");
+                        fgets(value, sizeof(value), stdin);
+                        value[strcspn(value, "\n")] = '\0';  // Strip newline
+                        editTableEntry(siteID, memberName, value);
+                    }
                     break;
+                
                 }
                 case 6:
                     reportByNeighbourhood();
