@@ -30,14 +30,6 @@ DataBase *Db;
  *  6- Ward
  */
 int countEntries(char *memberName, char * value){
-    /*
-    Can't I just turn the memberName into its ASCII value and use that for switches?
-    then I wouldn't need the helper function and can just use the converted ASCII
-    number as the cases in a switch case block???
-    ie for loop that loops through the member name string and finding 
-    each characters ascii then adding that to a variable and using that variable 
-    for the argument in a switchcases block? so the 6 if statements using strcmp won't be needed?
-    */
     const char *constanted = (const char *)memberName; // strcmpr takes const char
     int counted = 0;
     if (strcmp(constanted, "Table Type") == 0){  // fuck it 6 if statements cause i couldnt find a better way, and i cant change the parameters
@@ -81,9 +73,9 @@ int countEntries(char *memberName, char * value){
  * corresponding table.
  */
 void editTableEntry(int tableID,char *memberName, char *value){
-    int T_code = 0;
+    int T_code = 0; // will be the index in the table
     const char *constanted = (const char *)memberName; // since strcmp take const char
-    for (int i = 0; i < Db->size_of_PtableTable;i++){
+    for (int i = 0; i < Db->size_of_PtableTable;i++){ // loop through the contents of the picnicTableTable
         if ((Db->picnicTableTable[i].tableID) == tableID){
             if (strcmp(constanted, "Table Type") == 0){ 
                 T_code = editHelper(1, value);

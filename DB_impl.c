@@ -89,7 +89,6 @@ int countEntriesHelper(int member, const char *thing){ // just wanted to make a 
             }
         }
         case 5: {
-            val = atoi(thing);
             for (int i = 0;i < Db->size_of_PtableTable; i++){
                 if (strcmp((Db->picnicTableTable[i].neighbourhoodName), thing)){
                     count += 1;

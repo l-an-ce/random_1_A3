@@ -1,0 +1,72 @@
+Lance's functions:
+countEntries function:
+- used strcmp in order to determine what the member name to count would be
+- since strcmp only takes a const char as the first parameter and we are not allowed to change
+the parameters of the main functions i had to typecast it into a const char with constanted
+-created a helper function so as to not make the main function too crowded
+countEntriesHelper:
+- used switches and 6 cases to decide what to do so it can just jump to make it faster
+- Cases 4 and 6 use atoi to turn the string into a number to be able to compare to the int types of the member of picnicTable
+and the value sent by user
+editTableEntry Function:
+- Idea is loop through the picnicTableTable to find the tableID then compare whatever see which member it is to be edited
+- call on editHelper to find the code of the value is in its respective tables
+- should it not be in the specified table it will then instead call the resizeTable function
+and add it into the table
+editHelper Function:
+- just finds the code for whichever table it needs
+- created this helper function to 
+resizeTable function:
+- Used realloc to change the size and add the new unique element to 
+respective table
+Issues:
+- at first we had the member arr of Table struct be a char *arr[INIT_SIZE] but 
+I encountered a problem while trying to resize that I couldnt make it point to a new
+array that copied all the elements of the previous one so instead Aryan suggested 
+we turn arr into a double pointer that so we can dynamically change the size as needed
+
+Marek Design Document
+
+sortByMember Function:
+The approach to this function was a simplistic if/else structure in which the memberName
+was checked with all possible members from the PicnicTable data struct. If the memberName
+matched any of possible options, qsort would be ran with an accompanying compare function. 
+One of the possible downsides to this is long code with many compare function being needed,
+an alternate solution could have been a specific compare functions for string/alphabetical sorting 
+and another for int/numerical sorting. However this code would be much more difficult to read by 
+other group members and much harder to pinpoint where and possibly which members we're causing issues
+in troubleshooting if necessary.
+
+reportByNeighbourhood and reportByWard Functions:
+Both the report functions were written with the same approach. First the functions would use 
+the sortByMember function to get the data in the correct ascending order, then the functions would 
+loop through the PicnicTable database and print each table under the appropriate header. A problem 
+that did arise was visually pleasing spacing within the reportByNeighbourhood function. Having the first 
+item be printed outside of the if statement that prints the header like in reportByWard, caused there to 
+be incosistent spacing between header and items due to longer neighbourhood names needing to be displayed 
+for each neighbourhood. The first attempted solution was adding more \t spaces but this caused much too large 
+of a gap between headers and items. So a middleground was found where the first item could be printed at 
+the same time as the header with different spacing to the other subsequent items within that specific 
+neighbourhood section.  
+
+Lexis' dashboard.c Design Document
+
+Written to adhere to the guidelines provided, though with additions and error checking provisions.
+
+* importDatabase(), exportDatabase(), displaymenu(), breaks the program into smaller manageable units and takes input from the user for readability.
+* To handle multi-word inputs (i.e. member names or values) the program uses scanf("%[^\n]", ... ) format to ensure that the input is read correctly regardless of spaces.
+
+databaseLoaded:
+* Uses an integer flag to track whether a database has been successfully imported by using 0 or 1, and once the value is set to 1, the database is imported and operations
+* such as editing, sorting, and generating reports are only available AFTER loading the database. It makes sure that users cannot attempt operations on an uninitialized
+* database and prevents potential runtime errors.
+
+Input Handling:
+* Input is read from the user by using scanf for both numerical choices AND strings, and the format "%[^\n]" is used to make sure that different inputs for fields are taken.
+* getchar() is used for any newline characters left in the input buffer by scanf() in case strings get truncated
+
+importDatabase() & exportDatabase():
+* Allows the user to specify a filename (in this case, the picnic table csv file) and reads + writes to these files
+
+Error handling:
+* Added break after each case to prevent fall throughs for each choices
